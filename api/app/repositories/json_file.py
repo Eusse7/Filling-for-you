@@ -1,0 +1,95 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any
+
+from .base import KnowledgeRepository, LogRepository, ProfileRepository
+from ..schemas.knowledge import Knowledge
+from ..schemas.profile import Profile
+
+
+class JsonFileStore:
+    def __init__(self, file_path: Path) -> None:
+        self._path = file_path
+        self._path.parent.mkdir(parents=True, exist_ok=True)
+
+    def load(self) -> dict[str, Any]:
+        if not self._path.exists():
+            return self._default_payload()
+
+        try:
+            data = json.loads(self._path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            data = self._default_payload()
+
+        return {
+            "profile": data.get("profile") or Profile().model_dump(),
+            "knowledge": data.get("knowledge") or Knowledge().model_dump(),
+            "logs": data.get("logs") or [],
+        }
+
+    def save(self, payload: dict[str, Any]) -> None:
+        tmp_path = self._path.with_suffix(".tmp")
+        tmp_path.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        tmp_path.replace(self._path)
+
+    @staticmethod
+    def _default_payload() -> dict[str, Any]:
+        return {
+            "profile": Profile().model_dump(),
+            "knowledge": Knowledge().model_dump(),
+            "logs": [],
+        }
+
+
+class JsonFileProfileRepo(ProfileRepository):
+    def __init__(self, store: JsonFileStore) -> None:
+        self._store = store
+
+    def get(self) -> Profile:
+        data = self._store.load()
+        return Profile.model_validate(data["profile"])
+
+    def set(self, profile: Profile) -> Profile:
+        data = self._store.load()
+        data["profile"] = profile.model_dump()
+        self._store.save(data)
+        return profile
+
+
+class JsonFileKnowledgeRepo(KnowledgeRepository):
+    def __init__(self, store: JsonFileStore) -> None:
+        self._store = store
+
+    def get(self) -> Knowledge:
+        data = self._store.load()
+        return Knowledge.model_validate(data["knowledge"])
+
+    def set(self, knowledge: Knowledge) -> Knowledge:
+        data = self._store.load()
+        data["knowledge"] = knowledge.model_dump()
+        self._store.save(data)
+        return knowledge
+
+
+class JsonFileLogRepo(LogRepository):
+    def __init__(self, store: JsonFileStore, max_items: int = 500) -> None:
+        self._store = store
+        self._max_items = max_items
+
+    def add(self, event: dict) -> None:
+        data = self._store.load()
+        logs = data["logs"]
+        logs.append(event)
+        if len(logs) > self._max_items:
+            logs = logs[-self._max_items :]
+        data["logs"] = logs
+        self._store.save(data)
+
+    def list(self) -> list[dict]:
+        data = self._store.load()
+        return list(data["logs"])

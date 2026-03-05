@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "Filling For You",
+  "version": "0.2.0",
+  "description": "Detecta campos y autocompleta desde perfil/knowledge. Incluye modo seguro y bit\u00e1cora.",
+  "action": {
+    "default_popup": "popup/popup.html"
+  },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "http://localhost:3000/*",
+    "http://127.0.0.1:3000/*",
+    "http://localhost:5173/*",
+    "http://127.0.0.1:5173/*"
+  ],
+  "background": {
+    "service_worker": "background/index.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://localhost:5173/*",
+        "http://127.0.0.1:5173/*"
+      ],
+      "js": [
+        "content/logger.js",
+        "content/scan.js",
+        "content/classify.js",
+        "content/plan.js",
+        "content/apply.js",
+        "content/overlay.js",
+        "content/submitGuard.js",
+        "content/index.js"
+      ],
+      "css": [
+        "styles/overlay.css"
+      ]
+    }
+  ]
+}

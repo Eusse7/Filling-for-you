@@ -1,0 +1,36 @@
+#autofill-safe-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2147483647;
+  font-family: system-ui, Arial, sans-serif;
+}
+#af-list { margin-top: 8px; }
+#af-list .af-row { display:flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #eee; }
+#af-list .af-left { flex: 1; }
+#af-list .af-key { font-weight: 800; font-size: 12px; }
+#af-list .af-meta { font-size: 12px; opacity: .75; margin-top: 3px; }
+#af-list .af-right { width: 45%; font-family: ui-monospace, monospace; font-size: 12px; opacity: .9; overflow-wrap: anywhere; background: #fafafa; border: 1px solid #eee; border-radius: 10px; padding: 8px; }
+.af-card {
+  width: min(760px, 92vw);
+  max-height: 80vh;
+  overflow: auto;
+  background: #fff;
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  border: 1px solid #e8e8e8;
+}
+.af-title { font-weight: 900; margin-bottom: 6px; }
+.af-sub { font-size: 12px; opacity: .7; margin-bottom: 10px; }
+.af-actions { display:flex; gap: 8px; justify-content: flex-end; padding-top: 10px; }
+.af-actions button {
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  background: #f7f7f7;
+  cursor: pointer;
+}
