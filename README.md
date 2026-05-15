@@ -52,4 +52,4 @@ Servicios:
 - API: http://localhost:3000
 - Web: http://localhost:5173
 
-La base queda persistida en el volumen `api_data` del `docker-compose.yml`.
+La base queda persistida en el volumen `postgres_data` del `docker-compose.yml`.
